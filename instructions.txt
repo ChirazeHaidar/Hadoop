@@ -1,0 +1,49 @@
+/opt/hadoop/bin/hadoop jar /opt/hadoop/hadoop-examples-1.0.4.jar wordcount /user/zubair/tmp /user/zubair/tmp-output
+
+http://hadoop.apache.org/docs/r0.18.1/hdfs_design.html
+http://hadoop.apache.org/docs/r1.1.2/file_system_shell.html
+http://hadoop.apache.org/docs/r1.0.4/mapred_tutorial.html#Source+Code
+-----------------------------------------------------------
+
+
+login to hadoop.cs.odu.edu
+save WordCount.java in a local directory 
+mkdir wordcount_classes
+javac -classpath /opt/hadoop/hadoop-core-1.0.4.jar -d wordcount_classes WordCount.java
+jar -cvf wordcount.jar -C wordcount_classes/ .
+/opt/hadoop/bin/hadoop dfs -mkdir /user/zubair/wordcount
+/opt/hadoop/bin/hadoop dfs -ls /user/zubair
+/opt/hadoop/bin/hadoop dfs -mkdir /user/zubair/wordcount/input
+
+cat > file01
+Hello World Bye World
+
+cat > file02
+Hello Hadoop Goodbye Hadoop
+
+/opt/hadoop/bin/hadoop dfs -copyFromLocal file* /user/zubair/wordcount/input/
+/opt/hadoop/bin/hadoop dfs -ls /user/zubair/wordcount/input
+
+/opt/hadoop/bin/hadoop jar wordcount.jar org.myorg.WordCount /user/zubair/wordcount/input /user/zubair/wordcount/output
+ 
+/opt/hadoop/bin/hadoop dfs -ls /user/zubair/wordcount/output
+ 
+/opt/hadoop/bin/hadoop dfs -cat /user/zubair/wordcount/output/part-00000
+
+Bye     1
+Goodbye 1
+Hadoop  2
+Hello   2
+World   2
+
+---------------------------------------------------------------
+ 
+mkdir inverted_index
+javac -classpath /opt/hadoop/hadoop-core-1.0.4.jar -d inverted_classes InvertedIndex.java
+jar -cvf invertedindex.jar -C inverted_classes/ .
+/opt/hadoop/bin/hadoop dfs -mkdir /user/zubair/invertedindex
+/opt/hadoop/bin/hadoop dfs -ls /user/zubair
+/opt/hadoop/bin/hadoop dfs -mkdir /user/zubair/invertedindex/input
+/opt/hadoop/bin/hadoop dfs -copyFromLocal file* /user/zubair/invertedindex/input/
+/opt/hadoop/bin/hadoop jar invertedindex.jar org.myorg.InvertedIndex /user/zubair/invertedindex/input /user/zubair/invertedindex/output
+/opt/hadoop/bin/hadoop dfs -cat /user/zubair/invertedindex/output/part-00000

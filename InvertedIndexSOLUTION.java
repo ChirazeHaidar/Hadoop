@@ -14,16 +14,27 @@
 	      private Text location = new Text();	
 	      public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 	        FileSplit fileSplit = (FileSplit)reporter.getInputSplit();
-			String fileName = fileSplit.getPath().getName();
-			location.set(fileName);
-			// put your code here
+		String fileName = fileSplit.getPath().getName();
+		location.set(fileName);
+	        String line = value.toString();
+	        StringTokenizer tokenizer = new StringTokenizer(line);
+	        while (tokenizer.hasMoreTokens()) {
+	          word.set(tokenizer.nextToken());
+	          output.collect(word, location);
+	        }
 	      }
 	    }
 	
 	    public static class Reduce extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 	      public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-			StringBuilder toReturn = new StringBuilder();
-			// put your code here
+	        boolean first = true;
+		StringBuilder toReturn = new StringBuilder();
+	        while (values.hasNext()) {
+		  if (!first)
+		     toReturn.append(", ");
+		  first=false;
+		  toReturn.append(values.next().toString());
+	        }
 	        output.collect(key, new Text(toReturn.toString()));
 	      }
 	    }
